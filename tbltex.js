@@ -171,22 +171,24 @@ if (heads.length == 0) {
 		}
 	}
 	let headerList = [];
-	for (let i = 0; i < headerComment.length; i++) {
-		for (; i < headerComment.length; i++)
-			if (!headerComment[i].match(/,|\t| /)) break;
-		if (i >= headerComment.length) break;
-		let s = "", level = false;
-		do {
-			if (headerComment[i] == '"') {
-				i++;
-				if (i >= headerComment.length || headerComment[i] != '"') {
-					level = !level;
-					continue;
+	if (headerComment !== null) {
+		for (let i = 0; i < headerComment.length; i++) {
+			for (; i < headerComment.length; i++)
+				if (!headerComment[i].match(/,|\t| /)) break;
+			if (i >= headerComment.length) break;
+			let s = "", level = false;
+			do {
+				if (headerComment[i] == '"') {
+					i++;
+					if (i >= headerComment.length || headerComment[i] != '"') {
+						level = !level;
+						continue;
+					}
 				}
-			}
-			s += headerComment[i]; i++;
-		} while (i < headerComment.length && (level || !headerComment[i].match(/,|\t| /)));
-		headerList.push(s);
+				s += headerComment[i]; i++;
+			} while (i < headerComment.length && (level || !headerComment[i].match(/,|\t| /)));
+			headerList.push(s);
+		}
 	}
 	for (let i = 0; i < inputData[0].length; i++) {
 		let list = [];
