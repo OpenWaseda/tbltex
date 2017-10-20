@@ -47,6 +47,21 @@ if no files are specified with the column, stdin will be used.
 65	25.77	0.3012
 ```
 
+### most simple way
+
+```bash
+$ cat sample_a.txt| tbltex
+\begin{tabular}{c|c|c|c|c} \hline
+	sample & a & Column 2 & Column 3 & Column 4\\ \hline
+	15 & 288.15 & 1533.8500 & 3.0300 & 0.2960\\
+	25 & 298.15 & 1540.7500 & 3.5425 & 0.2844\\
+	35 & 308.15 & 1545.3500 & 4.0098 & 0.2722\\
+	45 & 318.15 & 1553.3500 & 4.6559 & 0.2630\\
+	55 & 328.15 & 1558.0500 & 5.3175 & 0.2499\\
+	65 & 338.15 & 1562.6500 & 6.1592 & 0.2390\\ \hline
+\end{tabular}
+```
+
 ### simple way
 
 show column 0-2 with the specified headers.
