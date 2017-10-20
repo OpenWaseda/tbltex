@@ -2,6 +2,8 @@
 
 const fs = require('fs');
 
+let headerComment = null;
+
 function readFile(fname) {
 	let data = [];
 	let buf;
@@ -14,7 +16,12 @@ function readFile(fname) {
 	let y = 0;
 	for (let i = 0; i < lines.length; i++) {
 		let j = 0, x = 0, line = lines[i];
-		if (line[0] == '#') continue;
+		if (line[0] == '#') {
+			if (headerComment === null) {
+				headerComment = line.slice(1);
+			}
+			continue;
+		}
 		for (;;) {
 			for (; j < line.length; j++)
 				if (!line[j].match(/,|\t| /)) break;
@@ -152,6 +159,52 @@ for (let i = 2; i < process.argv.length; i++) {
 		inputResolution = inputDotResolution = -1;
 		inputIndex++;
 		if (inputData[0] && inputIndex >= inputData[0].length) inputIndex = 0;
+	}
+}
+
+if (heads.length == 0) {
+	if (!inputData) {
+		inputData = readFile(null);
+		if (!inputData) {
+			console.error("You have to specify data file or use stdin.");
+			process.exit(1);
+		}
+	}
+	let headerList = [];
+	for (let i = 0; i < headerComment.length; i++) {
+		for (; i < headerComment.length; i++)
+			if (!headerComment[i].match(/,|\t| /)) break;
+		if (i >= headerComment.length) break;
+		let s = "", level = false;
+		do {
+			if (headerComment[i] == '"') {
+				i++;
+				if (i >= headerComment.length || headerComment[i] != '"') {
+					level = !level;
+					continue;
+				}
+			}
+			s += headerComment[i]; i++;
+		} while (i < headerComment.length && (level || !headerComment[i].match(/,|\t| /)));
+		headerList.push(s);
+	}
+	for (let i = 0; i < inputData[0].length; i++) {
+		let list = [];
+		for (let j = 0; j < inputData.length; j++) {
+			if (!inputData[j][i]) {
+				console.error("index error");
+				process.exit(1);
+			}
+			let dat = inputData[j][i];
+			list.push(parseValue(dat, -1, -1));
+		}
+		if (i >= headerList.length) {
+			heads.push("Column " + i);
+		} else {
+			heads.push(headerList[i]);
+		}
+		cols.push(list);
+		sorts.push(0);
 	}
 }
 
