@@ -40,59 +40,64 @@ function readFile(fname) {
 
 function parseValue(value, resolution, dotResolution) {
 	let digits = [], sign = 1, exponent = 0, point = -1, end;
-	if (resolution == -1 && dotResolution == -1) return value;
-	for (let i = 0; i < value.length; i++) {
-		let c = value[i];
-		if (c.match(/ \t/)) continue;
-		if (digits.length == 0 && sign == 1 && c == "-") sign = -1;
-		else if ("0123456789".indexOf(c) > -1) {
-			if (c == 0 && digits.length == 0) return value;
-			else digits.push(Number(c));
-		} else if (c == ".") {
-			if (point > -1) return value;
-			else point = digits.length;
-		} else if (c == "e" || c == "E") {
-			exponent = Number(value.slice(i + 1));
-			if (isNaN(exponent)) return value;
-			break;
-		} else return value;
-	}
-	if (point == -1) point = digits.length;
-	if (exponent != 0) {
-		point += exponent;
-		while (point > 0) {
-			digits.splice(0, 0, 0);
-			point++;
+	if (resolution != -1 || dotResolution != -1) {
+		for (let i = 0; i < value.length; i++) {
+			let c = value[i];
+			if (c.match(/ \t/)) continue;
+			if (digits.length == 0 && sign == 1 && c == "-") sign = -1;
+			else if ("0123456789".indexOf(c) > -1) {
+				if (c == 0 && digits.length == 0) return value;
+				else digits.push(Number(c));
+			} else if (c == ".") {
+				if (point > -1) return value;
+				else point = digits.length;
+			} else if (c == "e" || c == "E") {
+				exponent = Number(value.slice(i + 1));
+				if (isNaN(exponent)) return value;
+				break;
+			} else return value;
+		}
+		if (point == -1) point = digits.length;
+		if (exponent != 0) {
+			point += exponent;
+			while (point > 0) {
+				digits.splice(0, 0, 0);
+				point++;
+			}
+		}
+		value = "";
+		end = digits.length;
+		for (;;) {
+			if (dotResolution != -1) end = point + dotResolution;
+			else if (resolution != -1) end = resolution;
+			if (end < point) end = point;
+			if (digits.length > end && digits[end] >= 5) {
+				let i;
+				digits[end] = 0;
+				for (i = end - 1; i > -1; i--) {
+					digits[i] = digits[i] + 1;
+					if (digits[i] < 10) break;
+					digits[i] = 0;
+				}
+				if (i == -1) {
+					digits.splice(0, 0, 1);
+					end++;
+					point++;
+				} else break;
+			} else break;
+		}
+		if (sign < 0) value += "-";
+		for (let i = 0; i < end; i++) {
+			if (i == point) value += ".";
+			if (i >= digits.length) value += "0";
+			else value += digits[i];
 		}
 	}
-	let res = "";
-	end = digits.length;
-	for (;;) {
-		if (dotResolution != -1) end = point + dotResolution;
-		else if (resolution != -1) end = resolution;
-		if (end < point) end = point;
-		if (digits.length > end && digits[end] >= 5) {
-			let i;
-			digits[end] = 0;
-			for (i = end - 1; i > -1; i--) {
-				digits[i] = digits[i] + 1;
-				if (digits[i] < 10) break;
-				digits[i] = 0;
-			}
-			if (i == -1) {
-				digits.splice(0, 0, 1);
-				end++;
-				point++;
-			} else break;
-		} else break;
+	if (value.match(/(e|E)/)) {
+		value = value.replace(/(e|E)\+?/, "\\times e^{");
+		value = "$" + value + "}$";
 	}
-	if (sign < 0) res += "-";
-	for (let i = 0; i < end; i++) {
-		if (i == point) res += ".";
-		if (i >= digits.length) res += "0";
-		else res += digits[i];
-	}
-	return res;
+	return value;
 }
 
 let inputData = null;
