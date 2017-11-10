@@ -1,6 +1,6 @@
 {
   "name": "tbltex",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Generate latex table from tsv data",
   "main": "tbltex",
   "scripts": {

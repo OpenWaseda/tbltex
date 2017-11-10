@@ -94,7 +94,7 @@ function parseValue(value, resolution, dotResolution) {
 		}
 	}
 	if (value.match(/(e|E)/)) {
-		value = value.replace(/(e|E)\+?/, "\\times e^{");
+		value = value.replace(/(e|E)\+?/, "\\times 10^{");
 		value = "$" + value + "}$";
 	}
 	return value;
